@@ -1,16 +1,42 @@
 import React, { useEffect, useState } from "react";
-import { dummyCreationData } from "../assets/assets";
 import { Sparkles } from "lucide-react";
 import CreationItem from "../components/CreationItem";
-
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useAuth } from "@clerk/clerk-react";
+axios.defaults.baseURL =
+  import.meta.env.VITE_BASE_URL || "http://localhost:3001";
 const Dashboard = () => {
   const [creaions, setCreations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { getToken } = useAuth();
+
   const getCreations = async () => {
-    setCreations(dummyCreationData);
+    try {
+      const { data } = await axios.get("/v1/api/user/get-user-creations", {
+        headers: { Authorization: `Bearer ${await getToken()}` },
+      });
+      if (data.success) {
+        setCreations(data.creations);
+      } else {
+        toast.error(data.message || "Failed to fetch creations");
+      }  
+    } catch (error) {
+      toast.error(error.message || "Failed to fetch creations");
+    } finally {   
+      setLoading(false);
+    }
   };
   useEffect(() => {
     getCreations();
   }, []);
+  if(loading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    );
+  }
   return (
     <div className="h-full overflow-y-scroll p-6 ">
       <div className="flex justify-startgap-4 flex-wrap">

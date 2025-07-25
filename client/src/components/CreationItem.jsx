@@ -23,6 +23,7 @@ const CreationItem = ({ item }) => {
         </button>
       </div>
 
+      {/* Expanded content */}
       {expanded && (
         <div className="mt-4">
           {item.type === "image" ? (
@@ -35,9 +36,9 @@ const CreationItem = ({ item }) => {
             </div>
           ) : (
             <div className=" mt-2 max-h-64 overflow-y-auto text-sm text-slate-700 whitespace-pre-wrap">
-                <div className="reset-tw">
+              <div className="">
               <Markdown>{item.content}</Markdown>
-                </div>
+              </div>
             </div>
           )}
         </div>

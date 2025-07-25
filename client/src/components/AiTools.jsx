@@ -2,7 +2,7 @@ import React from "react";
 import { AiToolsData } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
-
+//AITools component to display a list of AI tools with icons, titles, and descriptions.
 const AiTools = () => {
     const navigate = useNavigate();
     const user = useUser();
@@ -32,8 +32,6 @@ const AiTools = () => {
                    />
                    <h3 className="mt-6 mb-3 text-lg font-semibold">{tool.title}</h3>
                    <p className="text-gray-400 text-sm max-w[95%]">{tool.description}</p>
-
-
                 </div>
             ))
         }
