@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import Markdown from "react-markdown";
 
 // Set default base URL
-axios.defaults.baseURL = import.meta.env.VITE_BASE_URL || "http://localhost:3001";
+axios.defaults.baseURL = import.meta.env.VITE_BASE_URL ;
 
 const WriteArticle = () => {
   const articleLength = [

@@ -5,7 +5,7 @@ import { useAuth } from "@clerk/clerk-react";
 import toast from "react-hot-toast";
 
 axios.defaults.baseURL =
-  import.meta.env.VITE_BASE_URL || "http://localhost:3001";
+  import.meta.env.VITE_BASE_URL ;
 const GenerateImages = () => {
   const imageStyle = [
     "realisic",

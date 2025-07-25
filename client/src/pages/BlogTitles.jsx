@@ -7,7 +7,7 @@ import Markdown from "react-markdown";
 
 // Set default base URL
 axios.defaults.baseURL =
-  import.meta.env.VITE_BASE_URL || "http://localhost:3001";
+  import.meta.env.VITE_BASE_URL;
 
 const BlogTitles = () => {
   const blogCategories = [

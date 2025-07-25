@@ -5,7 +5,7 @@ import { Scissors, Sparkles } from "lucide-react";
 import React, { useState } from "react";
 
 axios.defaults.baseURL =
-  import.meta.env.VITE_BASE_URL || "http://localhost:3001";
+  import.meta.env.VITE_BASE_URL ;
 
 const RemoveObject = () => {
   const [inputFile, setInputFile] = useState("");

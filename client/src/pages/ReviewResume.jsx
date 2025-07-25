@@ -6,7 +6,7 @@ import React, { useState } from "react";
 import Markdown from "react-markdown";
 
 axios.defaults.baseURL =
-  import.meta.env.VITE_BASE_URL || "http://localhost:3001";
+  import.meta.env.VITE_BASE_URL ;
 
 const ReviewResume = () => {
   const [inputFile, setInputFile] = useState("");
