@@ -1,23 +1,26 @@
 import OpenAI from "openai";
-import  sql  from "../configs/db.js"; 
+import sql from "../configs/db.js";
 import axios from "axios";
-import {v2 as cloudinary} from 'cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
 import FormData from 'form-data';
 import fs from 'fs';
 import pdf from 'pdf-parse/lib/pdf-parse.js';
 
 const AI = new OpenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-  baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+  apiKey: process.env.GROQ_API_KEY,
+  baseURL: "https://api.groq.com/openai/v1",
+  maxRetries: 5,
+  timeout: 60 * 1000,
 });
+
 
 export const generateArticle = async (req, res) => {
   try {
     const { userId } = req.auth();
-    const { prompt, length} = req.body;
+    const { prompt, length } = req.body;
 
     const response = await AI.chat.completions.create({
-      model: "gemini-2.0-flash",
+      model: "llama-3.3-70b-versatile",
       messages: [
         {
           role: "user",
@@ -25,7 +28,7 @@ export const generateArticle = async (req, res) => {
         },
       ],
       temperature: 0.7,
-      maxTokens:length|| 800,
+      max_tokens: length || 800,
     });
 
     const content = response.choices[0].message.content;
@@ -54,10 +57,10 @@ export const generateArticle = async (req, res) => {
 export const generateBlogTitle = async (req, res) => {
   try {
     const { userId } = req.auth();
-    const { prompt,category} = req.body;
+    const { prompt, category } = req.body;
 
     const response = await AI.chat.completions.create({
-      model: "gemini-2.0-flash",
+      model: "llama-3.3-70b-versatile",
       messages: [
         {
           role: "user",
@@ -65,7 +68,7 @@ export const generateBlogTitle = async (req, res) => {
         },
       ],
       temperature: 0.7,
-      maxTokens: 100,
+      max_tokens: 100,
     });
 
     const content = response.choices[0].message.content;
@@ -94,31 +97,31 @@ export const generateBlogTitle = async (req, res) => {
 export const generateImage = async (req, res) => {
   try {
     const { userId } = req.auth();
-    const { prompt,style,publish} = req.body;
+    const { prompt, style, publish } = req.body;
 
     const formData = new FormData();
-    formData.append('prompt',prompt);
-    const {data} = await axios.post('https://clipdrop-api.co/text-to-image/v1',formData,{
-      headers:{
-         ...formData.getHeaders(),
+    formData.append('prompt', prompt);
+    const { data } = await axios.post('https://clipdrop-api.co/text-to-image/v1', formData, {
+      headers: {
+        ...formData.getHeaders(),
         'x-api-key': process.env.CLIPDROP_API_KEY,
       },
       responseType: 'arraybuffer',
     })
     const base64Image = `data:image/png;base64,${Buffer.from(data, 'binary').toString('base64')}`;
 
-    const {secure_url}=await cloudinary.uploader.upload(base64Image)
-      
+    const { secure_url } = await cloudinary.uploader.upload(base64Image)
+
 
     await sql`
       INSERT INTO creations (user_id, prompt, content,type,publish)
-      VALUES (${userId}, ${prompt}, ${secure_url},'image',${publish ??false })
+      VALUES (${userId}, ${prompt}, ${secure_url},'image',${publish ?? false})
     `;
 
     res.status(200).json({
       success: true,
       message: "image generated successfully",
-      content:secure_url,
+      content: secure_url,
     });
   } catch (error) {
     console.error("Error generating image:", error?.response?.data || error);
@@ -136,13 +139,13 @@ export const backgroundRemove = async (req, res) => {
     const { userId } = req.auth();
     const image = req.file
 
-    const {secure_url}=await cloudinary.uploader.upload(image.path,{
-      transformation:[
+    const { secure_url } = await cloudinary.uploader.upload(image.path, {
+      transformation: [
         {
           effect: 'background_removal',
-          background_removal:'remove_the_background',
+          background_removal: 'remove_the_background',
 
-         }
+        }
       ]
     })
     await sql`
@@ -153,10 +156,10 @@ export const backgroundRemove = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "image generated successfully",
-      content:secure_url,
+      content: secure_url,
     });
   } catch (error) {
-    console.error("Error removeing bacground:",  error);
+    console.error("Error removeing bacground:", error);
     res.status(500).json({
       success: false,
       message: "Failed to remove background",
@@ -170,12 +173,12 @@ export const removeobject = async (req, res) => {
   try {
     const { userId } = req.auth();
     const image = req.file
-    const {object} = req.body;
+    const { object } = req.body;
 
-    const {public_id}=await cloudinary.uploader.upload(image.path)
-    const image_url = cloudinary.url(public_id,{
-      transformation:[
-        {effect:`gen_remove:${object}`}
+    const { public_id } = await cloudinary.uploader.upload(image.path)
+    const image_url = cloudinary.url(public_id, {
+      transformation: [
+        { effect: `gen_remove:${object}` }
       ],
       resorce_type: 'image',
     })
@@ -187,10 +190,10 @@ export const removeobject = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "object removed successfully",
-      content:image_url,
+      content: image_url,
     });
   } catch (error) {
-    console.error("Error removeing obj:",  error);
+    console.error("Error removeing obj:", error);
     res.status(500).json({
       success: false,
       message: "Failed to remove object",
@@ -227,7 +230,7 @@ Resume content:
 ${pdfData.text}`;
 
     const response = await AI.chat.completions.create({
-      model: "gemini-2.0-flash",
+      model: "llama-3.3-70b-versatile",
       messages: [
         {
           role: "user",
